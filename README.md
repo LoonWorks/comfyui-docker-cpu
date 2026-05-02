@@ -6,13 +6,13 @@ This is a Docker image for [ComfyUI](https://www.comfy.org/), which makes it ext
 
 To get started, you have to install [Docker](https://www.docker.com/). This can be either Docker Engine, which can be installed by following the [Docker Engine Installation Manual](https://docs.docker.com/engine/install/) or Docker Desktop, which can be installed by [downloading the installer](https://www.docker.com/products/docker-desktop/) for your operating system. If you want to use Docker Compose to run the ComfyUI Docker container, then Docker Compose must also be installed. Docker Desktop comes with Docker Compose pre-installed. If you are using Docker Engine, you may already have Docker Compose installed. You can check this by running `docker compose version` in your terminal. If Docker Compose is not installed, you can follow the [Docker Compose Installation Manual](https://docs.docker.com/compose/install/) to install it.
 
-To enable the usage of NVIDIA GPUs, the NVIDIA Container Toolkit must be installed. The installation process is detailed in the [official documentation](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+This is a CPU-only image. No GPU or NVIDIA runtime is required.
 
 ## Installation & Running
 
 ### Installing & Running Using Docker Run
 
-The ComfyUI Docker image is available from the [GitHub Container Registry](https://ghcr.io/lecode-official/comfyui-docker). Installing ComfyUI is as simple as pulling the image and starting a container, which can be achieved using the following command:
+The ComfyUI Docker image is available from the [GitHub Container Registry](https://ghcr.io/loonworks/comfyui-docker-cpu). Installing ComfyUI is as simple as pulling the image and starting a container, which can be achieved using the following command:
 
 ```shell
 docker run \
@@ -25,9 +25,7 @@ docker run \
     --volume "<path/to/custom/nodes/folder>:/opt/comfyui/custom_nodes:rw" \
     --volume "<path/to/output/folder>:/opt/comfyui/output:rw" \
     --publish 8188:8188 \
-    --runtime nvidia \
-    --gpus all \
-    ghcr.io/lecode-official/comfyui-docker:latest
+    ghcr.io/loonworks/comfyui-docker-cpu:latest
 ```
 
 For a full list of the available image tags, please refer to the [image tags](#available-image-tags) section. Please note, that the `<path/to/models/folder>`, `<path/to/custom/nodes/folder>` and `<path/to/output/folder>` must be replaced with paths to directories on the host system where the models, custom nodes and generated outputs (images, workflows, etc.) will be stored, e.g., `$HOME/.comfyui/models`, `$HOME/.comfyui/custom-nodes` and `$HOME/.comfyui/output`, which can be created like so: `mkdir -p $HOME/.comfyui/{models,custom-nodes,output}`.
@@ -39,7 +37,7 @@ For a full list of the available image tags, please refer to the [image tags](#a
 > docker cp comfyui:/opt/comfyui/output/. <path/to/output/folder>
 > ```
 
-The `--detach` flag causes the container to run in the background and `--restart unless-stopped` configures the Docker Engine to automatically restart the container if it stopped itself, experienced an error, or the computer was shutdown, unless you explicitly stopped the container using `docker stop`. This means that ComfyUI will be automatically started in the background when you boot your computer. The two `--env` arguments inject the user ID and group ID of the current host user into the container. During startup, a user with the same user ID and group ID will be created, and ComfyUI will be run using this user. This ensures that files written to the volumes (e.g., models, custom nodes installed with the ComfyUI Manager, and outputs) will be owned by the host system's user. Normally, the user inside the container is `root`, which means that the files that are written from the container to the host system are also owned by `root`. If you have run ComfyUI Docker without setting the environment variables, then you may have to change the owner of the files in the models and custom nodes directories: `sudo chown -r "$(id -un):$(id -gn)" <path/to/models/folder> <path/to/custom/nodes/folder> <path/to/output/folder>`. The `--runtime nvidia` and `--gpus all` arguments enable ComfyUI to access the GPUs of your host system. If you do not want to expose all GPUs, you can specify the desired GPU index or ID instead.
+The `--detach` flag causes the container to run in the background and `--restart unless-stopped` configures the Docker Engine to automatically restart the container if it stopped itself, experienced an error, or the computer was shutdown, unless you explicitly stopped the container using `docker stop`. This means that ComfyUI will be automatically started in the background when you boot your computer. The two `--env` arguments inject the user ID and group ID of the current host user into the container. During startup, a user with the same user ID and group ID will be created, and ComfyUI will be run using this user. This ensures that files written to the volumes (e.g., models, custom nodes installed with the ComfyUI Manager, and outputs) will be owned by the host system's user. Normally, the user inside the container is `root`, which means that the files that are written from the container to the host system are also owned by `root`. If you have run ComfyUI Docker without setting the environment variables, then you may have to change the owner of the files in the models and custom nodes directories: `sudo chown -r "$(id -un):$(id -gn)" <path/to/models/folder> <path/to/custom/nodes/folder> <path/to/output/folder>`.
 
 After the container has started, you can navigate to [localhost:8188](http://localhost:8188) to access ComfyUI.
 
@@ -56,9 +54,7 @@ docker run \
     --volume "<path/to/custom/nodes/folder>:/opt/comfyui/custom_nodes:rw" \
     --volume "<path/to/output/folder>:/opt/comfyui/output:rw" \
     --publish 8188:8188 \
-    --runtime nvidia \
-    --gpus all \
-    ghcr.io/lecode-official/comfyui-docker:latest \
+    ghcr.io/loonworks/comfyui-docker-cpu:latest \
     --enable-cors-header <origin>
 ```
 
@@ -122,8 +118,6 @@ docker compose up --detach
 
 If the ComfyUI Docker image is not available locally, it will be pulled automatically. This will start ComfyUI in the background. The --detach flag causes the container to run in the background. You can then navigate to [localhost:8188](http://localhost:8188) to access ComfyUI.
 
-Docker Compose will automatically assign all NVIDIA GPUs of your host system to the container. If you do not want to expose all GPUs, you have to update the `compose.yml` file to specify the desired GPUs under the `services.comfyui.deploy.resources.reservations.devices` section. `count: all` assigns all available GPUs to the container. You can replace it with `count: 1` to assign only one GPU, or you can specify specific GPU indices or IDs using the `device_ids` field. For example, to assign GPU-0 and GPU-3, you can specify `device_ids: ['0', '3']`.
-
 To view the logs of the running container, you can use the following command:
 
 ```shell
@@ -152,15 +146,12 @@ docker compose up --detach --force-recreate
 
 The ComfyUI Docker image is available with different tags. The available tags are:
 
-- `latest`: The latest stable version of ComfyUI Docker. This will use the latest versions of ComfyUI, ComfyUI Manager, and PyTorch available at the time of the image build. It will not always use the most recent version of CUDA and cuDNN, but may instead use a slightly older, but more broadly compatible version.
-- `0.6`, `0.6.1`: These tags will always use the specific version of ComfyUI Docker, and the latest versions of ComfyUI, ComfyUI Manager and PyTorch available at the time of the image build. It will not always use the most recent version of CUDA and cuDNN, but may instead use a slightly older, but more broadly compatible version.
-- `0.6-comfyui-0.8.2`, `0.6.1-comfyui-0.8.2`: These tags will always use the specific versions of ComfyUI Docker and ComfyUI, and the latest versions of ComfyUI Manager and PyTorch available at the time of the image build. It will not always use the most recent version of CUDA and cuDNN, but may instead use a slightly older, but more broadly compatible version.
-- `0.6-comfyui-0.8.2-comfyui-manager-4.0.5`, `0.6.0-comfyui-0.8.2-comfyui-manager-4.0.5`: These tags will always use the specific versions of ComfyUI Docker, ComfyUI, and ComfyUI Manager, and the latest version of PyTorch available at the time of the image build. It will not always use the most recent version of CUDA and cuDNN, but may instead use a slightly older, but more broadly compatible version.
-- `0.6-comfyui-0.8.2-comfyui-manager-4.0.5-pytorch-2.9.1-cuda-12.8-cudnn-9`, `0.6.1-comfyui-0.8.2-comfyui-manager-4.0.5-pytorch-2.9.1-cuda-12.8-cudnn-9`: These tags will always use the specific versions of ComfyUI Docker, ComfyUI, ComfyUI Manager, PyTorch, CUDA, and cuDNN.
-- `sha-<short-commit-sha>`: These tags point to ComfyUI Docker that were build from the specific commit. They will always use the versions of ComfyUI Docker, ComfyUI, ComfyUI Manager, and PyTorch that were the most recent at the time of the image build. It will not always use the most recent version of CUDA and cuDNN available at the time of the build, but may instead use a slightly older, but more broadly compatible version.
-
-> [!WARNING]
-> For releases prior to v0.6.1, only a single PyTorch, CUDA and cuDNN version combination was available and the image tags did not include the PyTorch, CUDA and cuDNN versions. Starting from v0.6.1, multiple combinations of PyTorch, CUDA and cuDNN versions are built and made available. Please refer to the [Changelog](CHANGELOG.md) for more information.
+- `latest`: The latest stable version of ComfyUI Docker (CPU-only). This will use the latest versions of ComfyUI, ComfyUI Manager, and PyTorch (CPU) available at the time of the image build.
+- `0.6`, `0.6.1`: These tags will always use the specific version of ComfyUI Docker, and the latest versions of ComfyUI, ComfyUI Manager and PyTorch (CPU) available at the time of the image build.
+- `0.6-comfyui-0.8.2`, `0.6.1-comfyui-0.8.2`: These tags will always use the specific versions of ComfyUI Docker and ComfyUI, and the latest versions of ComfyUI Manager and PyTorch (CPU) available at the time of the image build.
+- `0.6-comfyui-0.8.2-comfyui-manager-4.0.5`, `0.6.0-comfyui-0.8.2-comfyui-manager-4.0.5`: These tags will always use the specific versions of ComfyUI Docker, ComfyUI, and ComfyUI Manager, and the latest version of PyTorch (CPU) available at the time of the image build.
+- `0.6-comfyui-0.8.2-comfyui-manager-4.0.5-pytorch-2.9.1`, `0.6.1-comfyui-0.8.2-comfyui-manager-4.0.5-pytorch-2.9.1`: These tags will always use the specific versions of ComfyUI Docker, ComfyUI, ComfyUI Manager, and PyTorch.
+- `sha-<short-commit-sha>`: These tags point to ComfyUI Docker that were built from a specific commit. They will always use the versions of ComfyUI Docker, ComfyUI, ComfyUI Manager, and PyTorch that were the most recent at the time of the image build.
 
 ## Updating
 
@@ -172,7 +163,7 @@ To update ComfyUI Docker to the latest version you have to first stop the runnin
 docker stop comfyui
 docker rm comfyui
 
-docker pull ghcr.io/lecode-official/comfyui-docker:latest
+docker pull ghcr.io/loonworks/comfyui-docker-cpu:latest
 docker image prune # Optionally remove dangling images
 
 docker run \
@@ -185,9 +176,7 @@ docker run \
     --volume "<path/to/custom/nodes/folder>:/opt/comfyui/custom_nodes:rw" \
     --volume "<path/to/output/folder>:/opt/comfyui/output:rw" \
     --publish 8188:8188 \
-    --runtime nvidia \
-    --gpus all \
-    ghcr.io/lecode-official/comfyui-docker:latest
+    ghcr.io/loonworks/comfyui-docker-cpu:latest
 ```
 
 ### Updating Using Docker Compose
@@ -205,9 +194,9 @@ docker compose up --detach
 If you want to use the bleeding edge development version of the Docker image, you can also clone the repository and build the image yourself:
 
 ```shell
-git clone https://github.com/lecode-official/comfyui-docker.git
-cd comfyui-docker
-docker build --tag comfyui-docker:latest source
+git clone https://github.com/LoonWorks/comfyui-docker-cpu.git
+cd comfyui-docker-cpu
+docker build --tag comfyui-docker-cpu:latest source
 ```
 
 Now, a container can be started like so:
@@ -223,9 +212,7 @@ docker run \
     --volume "<path/to/custom/nodes/folder>:/opt/comfyui/custom_nodes:rw" \
     --volume "<path/to/output/folder>:/opt/comfyui/output:rw" \
     --publish 8188:8188 \
-    --runtime nvidia \
-    --gpus all \
-    comfyui-docker:latest
+    comfyui-docker-cpu:latest
 ```
 
 ## License

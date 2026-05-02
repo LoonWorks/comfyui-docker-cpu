@@ -4,7 +4,7 @@ name: comfyui-docker
 
 services:
   comfyui:
-    image: ghcr.io/lecode-official/comfyui-docker:${IMAGE_TAG:-latest}
+    image: ghcr.io/loonworks/comfyui-docker-cpu:${IMAGE_TAG:-latest}
     container_name: comfyui
     restart: unless-stopped
     environment:
@@ -16,10 +16,3 @@ services:
       - ${MODELS_PATH:-${HOME}/.comfyui/models}:/opt/comfyui/models:rw
       - ${CUSTOM_NODES_PATH:-${HOME}/.comfyui/custom-nodes}:/opt/comfyui/custom_nodes:rw
       - ${OUTPUT_PATH:-${HOME}/.comfyui/output}:/opt/comfyui/output:rw
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]

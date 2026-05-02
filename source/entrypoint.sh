@@ -62,10 +62,11 @@ done
 if [ -z "$USER_ID" ] || [ -z "$GROUP_ID" ];
 then
     echo "Running container as $USER..."
-    exec /opt/conda/bin/python main.py \
+    exec /opt/venv/bin/python main.py \
         --port 8188 \
         --listen 0.0.0.0 \
         --disable-auto-launch \
+        --cpu \
         "$@"
 else
     echo "Creating non-root user..."
@@ -77,9 +78,10 @@ else
 
     echo "Running container as comfyui-user ($USER_ID:$GROUP_ID)..."
     sudo --set-home --preserve-env=PATH --user \#$USER_ID \
-        /opt/conda/bin/python main.py \
+        /opt/venv/bin/python main.py \
             --port 8188 \
             --listen 0.0.0.0 \
             --disable-auto-launch \
+            --cpu \
             "$@"
 fi
