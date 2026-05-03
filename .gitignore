@@ -1,3 +1,7 @@
+.env
+
+# openspec
+openspec/
 
 # Operating system-specific icon/file preview databases
 .DS_Store
