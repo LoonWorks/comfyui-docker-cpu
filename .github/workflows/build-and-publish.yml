@@ -44,14 +44,13 @@ jobs:
           echo "comfyui_manager_version=$COMFYUI_MANAGER_VERSION" >> "$GITHUB_OUTPUT"
           echo "pytorch_version=$PYTORCH_VERSION" >> "$GITHUB_OUTPUT"
 
-      # Logs in to the configured registry (defaults to GHCR) using the triggering actor's credentials.
-      # Override via repository variables: vars.DOCKER_REGISTRY and secrets.REGISTRY_PASSWORD
+      # Logs in to GHCR using the triggering actor's GitHub token.
       - name: Log in to the GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ vars.DOCKER_REGISTRY || 'ghcr.io' }}
-          username: ${{ vars.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD || secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Generates image name, tags, and OCI labels from git metadata.
       # Tags produced (single CPU-only variant, latest always set):
@@ -65,7 +64,7 @@ jobs:
         id: docker-image-metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ vars.DOCKER_IMAGE || format('ghcr.io/{0}', github.repository) }}
+          images: ${{ format('ghcr.io/{0}', github.repository) }}
           flavor: |
             latest=true
           tags: |
@@ -94,11 +93,9 @@ jobs:
           labels: ${{ steps.docker-image-metadata.outputs.labels }}
 
       # Generates an unforgeable build-provenance attestation for supply-chain security.
-      # Skipped when publishing to a non-GHCR registry (attestations are only supported for GHCR).
       - name: Generate Artifact Attestation
-        if: ${{ startsWith(vars.DOCKER_IMAGE || 'ghcr.io', 'ghcr.io') }}
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ${{ vars.DOCKER_IMAGE || format('ghcr.io/{0}', github.repository) }}
+          subject-name: ${{ format('ghcr.io/{0}', github.repository) }}
           subject-digest: ${{ steps.build-and-push-docker-image.outputs.digest }}
           push-to-registry: true
