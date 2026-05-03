@@ -29,6 +29,6 @@
 ## 6. Validate and push
 
 - [x] 6.1 Validate the YAML syntax of the updated workflow file (e.g. `python -c "import yaml; yaml.safe_load(open('.github/workflows/build-and-publish.yml'))"`)
-- [ ] 6.2 Commit the updated workflow to the `main` branch and push to `LoonWorks/comfyui-docker-cpu`
+- [x] 6.2 Commit the updated workflow to the `main` branch and push to `LoonWorks/comfyui-docker-cpu`
 - [x] 6.3 Create and push a test tag to verify the workflow triggers and publishes the image successfully
-- [ ] 6.3 Create and push a test tag to verify the workflow triggers and publishes the image successfully
+- [x] 6.3 Create and push a test tag to verify the workflow triggers and publishes the image successfully
