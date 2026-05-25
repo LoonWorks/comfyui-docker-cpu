@@ -1,7 +1,7 @@
 
 # Defines build arguments for the versions of ComfyUI, ComfyUI Manager, and PyTorch to use
-ARG COMFYUI_VERSION=0.8.2
-ARG COMFYUI_MANAGER_VERSION=4.0.5
+ARG COMFYUI_VERSION=0.22.2
+ARG COMFYUI_MANAGER_VERSION=4.2.1
 ARG PYTORCH_VERSION=2.9.1
 
 # This image is based on the official Python 3.13 slim image for a minimal, CPU-only build
