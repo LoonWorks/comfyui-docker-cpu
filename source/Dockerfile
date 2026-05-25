@@ -32,7 +32,7 @@ RUN git clone https://github.com/Comfy-Org/ComfyUI.git /opt/comfyui && \
     git checkout "v${COMFYUI_VERSION}"
 
 # Clones the ComfyUI Manager repository and checks out the configured release; ComfyUI Manager is an extension for ComfyUI that enables users to install
-# custom nodes and download models directly from the ComfyUI interface; instead of installing it to "/opt/comfyui/custom_nodes/ComfyUI-Manager", which
+# custom nodes and download models directly from the ComfyUI interface; instead of installing it to "/opt/comfyui/custom_nodes/comfyui-manager", which
 # is the directory it is meant to be installed in, it is installed to its own directory; the entrypoint will symlink the directory to the correct
 # location upon startup; the reason for this is that the ComfyUI Manager must be installed in the same directory that it installs custom nodes to, but
 # this directory is mounted as a volume, so that the custom nodes are not installed inside of the container and are not lost when the container is

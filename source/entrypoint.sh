@@ -28,17 +28,17 @@ done
 
 # Creates the symlink for the ComfyUI Manager to the custom nodes directory, which is also mounted from the host
 echo "Creating symlink for ComfyUI Manager..."
-rm --force /opt/comfyui/custom_nodes/ComfyUI-Manager
+rm --force /opt/comfyui/custom_nodes/comfyui-manager
 ln -s \
     /opt/comfyui-manager \
-    /opt/comfyui/custom_nodes/ComfyUI-Manager
+    /opt/comfyui/custom_nodes/comfyui-manager
 
 # The custom nodes that were installed using the ComfyUI Manager may have requirements of their own, which are not installed when the container is
 # started for the first time; this loops over all custom nodes and installs the requirements of each custom node
 echo "Installing requirements for custom nodes..."
 for CUSTOM_NODE_DIRECTORY in /opt/comfyui/custom_nodes/*;
 do
-    if [ "$CUSTOM_NODE_DIRECTORY" != "/opt/comfyui/custom_nodes/ComfyUI-Manager" ];
+    if [ "$CUSTOM_NODE_DIRECTORY" != "/opt/comfyui/custom_nodes/comfyui-manager" ];
     then
         if [ -f "$CUSTOM_NODE_DIRECTORY/requirements.txt" ];
         then

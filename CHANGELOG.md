@@ -2,6 +2,12 @@
 
 > **Note:** This is a CPU-only fork of [comfyui-docker](https://github.com/lecode-official/comfyui-docker) maintained at [LoonWorks/comfyui-docker-cpu](https://github.com/LoonWorks/comfyui-docker-cpu). No NVIDIA runtime or GPU is required. The release history below reflects the upstream project history and serves as context for the changes made prior to this fork.
 
+## Unreleased
+
+- Normalized the runtime ComfyUI Manager custom node path to `/opt/comfyui/custom_nodes/comfyui-manager` so it aligns with the upstream recommended installation layout.
+- Updated startup logic to consistently skip only the canonical manager path when installing requirements for custom nodes.
+- Updated documentation and in-file comments to reflect the canonical manager install path.
+
 ## v0.6.3 (January 9, 2026)
 
 - This is another emergency release to fix an issue in v0.6.2 where the ComfyUI Docker image failed to build, because the build arguments for the versions of ComfyUI and ComfyUI Manager were defined before the `FROM` instruction in the Dockerfile. This only caused an issue now, because the "v" prefix in the ComfyUI version (e.g., "v0.8.2") was removed and then interpolated directly into the `git checkout` command, which led Git to fail with an error stating that the path spec "v" does not exist. The build arguments for the ComfyUI and ComfyUI Manager versions have now been moved to be defined after the `FROM` instruction in the Dockerfile.
